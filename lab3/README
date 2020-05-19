@@ -1,21 +1,21 @@
-##Further instructions shows what expressions can the parser operate
-*Prefix operators as:
+## Further instructions shows what expressions can the parser operate
+* Prefix operators as:
 -25
 !true
 !false
-*Infix operator: 
+* Infix operator: 
 2 + 9
 1 - 4
-*Comparison operators:
+* Comparison operators:
 2 == 2
 2 !=4
 3 < 5
 5 > 7
-*Adding paranthesis in order to change the precedence of the operators:
+* Adding paranthesis in order to change the precedence of the operators:
 (1+2) * 5
-*Call expressions:
+* Call expressions:
 add(1, 6);
 max(4, 8);
-*Let Statement: 
+* Let Statement: 
 let x = 1 + 5; 
 
