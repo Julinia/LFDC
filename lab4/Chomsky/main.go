@@ -190,6 +190,61 @@ func removeInaccesibles(rules Productions) Productions {
 	return rules
 }
 
+func removeUnproductive(rules Productions) Productions {
+	var productive []string
+	//check if key has terminal element
+	for key := range rules {
+		for _, el := range rules[key] {
+			if _, found := rules[el]; !found && len(el) == 1 {
+				productive = unique(append(productive, key))
+			}
+		}
+	}
+
+	//check other productions
+	counter := 1
+	for counter != 0 {
+		for key := range rules {
+			if !stringInSlice(key, productive) {
+				for _, el := range rules[key] {
+					for _, letters := range el {
+						if stringInSlice(string(letters), productive) {
+							productive = unique(append(productive, key))
+							counter++
+						}
+					}
+				}
+			}
+		}
+		counter--
+	}
+
+	for key := range rules { //[A]
+		if !stringInSlice(key, productive) {
+			delete(rules, key)
+			for inner := range rules { //[S[...], B[...]]
+				for i, inner_el := range rules[inner] {
+					if strings.Contains(inner_el, key) {
+						rules[inner] = removeElement(rules[inner], i)
+					}
+				}
+			}
+		}
+	}
+
+	fmt.Println(rules)
+	return rules
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 	raw := readFile("input.txt")
 
@@ -197,6 +252,8 @@ func main() {
 	rules = removeEpsilons(rules)
 	rules = removeUnits(rules)
 	rules = removeInaccesibles(rules)
+	rules = removeUnproductive(rules)
 
 	fmt.Println(rules)
+
 }
