@@ -232,8 +232,45 @@ func removeUnproductive(rules Productions) Productions {
 		}
 	}
 
-	fmt.Println(rules)
 	return rules
+}
+
+func makeChomsky(rules Productions) Productions {
+	newSymbol := 'X'
+	counter := 1
+	cache := make(map[string]string)
+	for counter != 0 {
+		for key := range rules {
+			for i, el := range rules[key] {
+				if len(el) > 2 {
+					if v, found := cache[el]; found {
+						rules[key][i] = v
+						fmt.Println(v, el)
+					} else {
+						for len(rules[string(newSymbol)]) != 0 {
+							newSymbol--
+						}
+						cache[el] = string(newSymbol) + string(el[len(el)-1])
+						rules[string(newSymbol)] = []string{el[0 : len(el)-1]}
+						rules[key][i] = cache[el]
+						counter++
+						newSymbol--
+					}
+				}
+			}
+		}
+		counter--
+	}
+	return rules
+}
+
+func containsTerminal(rules Productions, prod string) bool {
+	for _, letter := range prod {
+		if _, found := rules[string(letter)]; !found {
+			return true
+		}
+	}
+	return false
 }
 
 func stringInSlice(a string, list []string) bool {
@@ -253,6 +290,7 @@ func main() {
 	rules = removeUnits(rules)
 	rules = removeInaccesibles(rules)
 	rules = removeUnproductive(rules)
+	rules = makeChomsky(rules)
 
 	fmt.Println(rules)
 
