@@ -236,7 +236,7 @@ func removeUnproductive(rules Productions) Productions {
 }
 
 func makeChomsky(rules Productions) Productions {
-	newSymbol := 'X'
+	newSymbol := 'Z'
 	counter := 1
 	cache := make(map[string]string)
 	for counter != 0 {
@@ -245,7 +245,6 @@ func makeChomsky(rules Productions) Productions {
 				if len(el) > 2 {
 					if v, found := cache[el]; found {
 						rules[key][i] = v
-						fmt.Println(v, el)
 					} else {
 						for len(rules[string(newSymbol)]) != 0 {
 							newSymbol--
@@ -261,6 +260,30 @@ func makeChomsky(rules Productions) Productions {
 		}
 		counter--
 	}
+	for key := range rules {
+		for i, prod := range rules[key] {
+			if containsTerminal(rules, prod) && len(prod) == 2 {
+				if v, found := cache[prod]; found {
+					rules[key][i] = v
+				} else {
+					for _, letter := range prod {
+						if containsTerminal(rules, string(letter)) {
+							if v, found := cache[string(letter)]; found {
+								rules[key][i] = strings.ReplaceAll(rules[key][i], string(letter), v)
+							} else {
+								cache[string(letter)] = string(newSymbol)
+								rules[string(newSymbol)] = []string{string(letter)}
+								rules[key][i] = strings.ReplaceAll(rules[key][i], string(letter), string(newSymbol))
+								newSymbol--
+							}
+						}
+					}
+					cache[prod] = rules[key][i]
+				}
+			}
+		}
+	}
+
 	return rules
 }
 
